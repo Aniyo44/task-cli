@@ -1,6 +1,18 @@
 import datetime
 tasks = []
 next_id=1 
+
+def mark_todo(task_id):
+    for task in tasks:
+        if task["id"]== task_id:
+            task["status"]="todo"
+            task["updatedAt"] = get_current_time()
+            print(f"Task ID {task_id} todo.")
+            return
+    print("NO task found with that ID.")    
+
+
+
 def mark_in_progress(task_id):
     for task in tasks:
         if task["id"] == task_id:
@@ -69,12 +81,15 @@ def add_task():
     else:
         print("No task entered. Try again.")
 
-def show_tasks():
-    if not tasks:
-        print("No tasks yet.")
+
+def show_tasks(status_filter=None):
+    filtered_tasks = tasks if status_filter is None else [task for task in tasks if task["status"] == status_filter]
+
+    if not filtered_tasks:
+        print("No tasks found." if status_filter else "No tasks yet.")
     else:
-        print("Your tasks:")
-        for task in tasks:
+        print("Your tasks:" if status_filter is None else f"Your {status_filter} tasks:")
+        for task in filtered_tasks:
             print(f"ID: {task['id']}, Desc: {task['description']}, Status: {task['status']}")
 
 def main():
@@ -82,11 +97,10 @@ def main():
     while True:
         command = input('''Enter a command 
             - add 
-             - list
+             - list(add their status to filter ex : list done/ list todo)
               - remove
                - update
-                - mark-in-progress
-                 - mark-done
+                - mark-in-progress / mark-done / mark-todo
                   - exit
              ''').strip().lower()
 
@@ -94,6 +108,12 @@ def main():
             add_task()
         elif command == "list":
             show_tasks()
+        elif command.startswith("list"):
+            parts = command.split()
+            if len(parts) == 2 and parts[1] in ["todo", "in-progress", "done"]:
+                show_tasks(parts[1])
+            else:
+                show_tasks()
         elif command == "update":
             update_task()
         elif command=="remove":
@@ -108,6 +128,12 @@ def main():
             try:
                 task_id = int(input("Enter the ID of the task to mark done: "))
                 mark_done(task_id)
+            except ValueError:
+                print("Invalid ID.")
+        elif command.startswith("mark-todo"):
+            try:
+                task_id = int(input("Enter the ID of the task to mark todo: "))
+                mark_todo(task_id)
             except ValueError:
                 print("Invalid ID.")
         elif command == "exit":
