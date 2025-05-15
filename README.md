@@ -32,7 +32,7 @@ pip install colorama
 Run the script from your terminal:
 ```bash
 
-    python main.py
+python main.py
 ```
 
 🧪 Example
