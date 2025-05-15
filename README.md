@@ -27,6 +27,8 @@ Install it with:
 pip install colorama
 ```
 🛠️ How to Use
+
+
 Run the script from your terminal:
 ```bash
 
