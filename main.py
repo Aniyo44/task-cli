@@ -80,7 +80,15 @@ def show_tasks():
 def main():
     print("Welcome to the Task Manager CLI!")
     while True:
-        command = input("Enter a command (add, list,remove,update, mark-in-progress, mark-done,exit): ").strip().lower()
+        command = input('''Enter a command 
+            - add 
+             - list
+              - remove
+               - update
+                - mark-in-progress
+                 - mark-done
+                  - exit
+             ''').strip().lower()
 
         if command == "add":
             add_task()
