@@ -1,6 +1,15 @@
 import datetime
 import os 
 import json 
+from colorama import init, Fore, Style
+
+init(autoreset=True)
+SUCCESS = Fore.GREEN + Style.BRIGHT
+ERROR = Fore.RED + Style.BRIGHT
+INFO = Fore.CYAN + Style.BRIGHT
+WARN = Fore.YELLOW + Style.BRIGHT
+RESET = Style.RESET_ALL
+
 TASKS_FILE = "tasks.json"
 
 tasks = []
@@ -15,7 +24,7 @@ def load_tasks():
                 tasks = tasks_data.get("tasks", [])
                 next_id = tasks_data.get("next_id", 1)
             except json.JSONDecodeError:
-                print("Error reading tasks.json. Starting with an empty task list.")
+                print(ERROR+f"Error reading tasks.json. Starting with an empty task list.")
                 tasks = []
                 next_id = 1
     else:
@@ -34,7 +43,7 @@ def mark_todo(task_id):
             task["status"]="todo"
             task["updatedAt"] = get_current_time()
             save_tasks() 
-            print(f"Task ID {task_id} todo.")
+            print(WARN+f"Task ID {task_id} todo.")
             return
     print("NO task found with that ID.")    
 
@@ -46,9 +55,9 @@ def mark_in_progress(task_id):
             task["status"] = "in-progress"
             task["updatedAt"] = get_current_time()
             save_tasks() 
-            print(f"Task ID {task_id} marked as in-progress.")
+            print(SUCCESS+f"Task ID {task_id} marked as in-progress.")
             return
-    print("No task found with that ID.")
+    print(ERROR+f"No task found with that ID.")
 
 def mark_done(task_id):
     for task in tasks:
@@ -56,9 +65,9 @@ def mark_done(task_id):
             task["status"] = "done"
             task["updatedAt"] = get_current_time()
             save_tasks() 
-            print(f"Task ID {task_id} marked as done.")
+            print(SUCCESS+f"Task ID {task_id} marked as done.")
             return
-    print("No task found with that ID.")
+    print(ERROR+f"No task found with that ID.")
 def get_current_time():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 def update_task():
@@ -74,11 +83,11 @@ def update_task():
                     task["status"] = new_status
                 task["updatedAt"] = get_current_time()
                 save_tasks() 
-                print(f"Updated task ID {task_id}")
+                print(SUCCESS+f"Updated task ID {task_id}")
                 return
-        print("No task found with that ID.")
+        print(ERROR+f"No task found with that ID.")
     except ValueError:
-        print("Please enter a valid number.")
+        print(ERROR+f"Please enter a valid number.")
 
 def remove_task():
     try:
@@ -87,11 +96,11 @@ def remove_task():
             if task["id"] == task_id:
                 tasks.remove(task)
                 save_tasks() 
-                print(f"Removed task ID {task_id}")
+                print(SUCCESS+f"Removed task ID {task_id}")
                 return
-        print("No task found with that ID.")
+        print(ERROR+f"No task found with that ID.")
     except ValueError:
-        print("Please enter a valid number.")
+        print(ERROR+f"Please enter a valid number.")
 
 
 def add_task():
@@ -108,28 +117,28 @@ def add_task():
         }
         tasks.append(task)
 
-        print(f"Task added with ID {next_id}")
+        print(SUCCESS+f"Task added with ID {next_id}")
         next_id += 1
         save_tasks() 
     else:
-        print("No task entered. Try again.")
+        print(ERROR+f"No task entered. Try again.")
 
 
 def show_tasks(status_filter=None):
     filtered_tasks = tasks if status_filter is None else [task for task in tasks if task["status"] == status_filter]
 
     if not filtered_tasks:
-        print("No tasks found." if status_filter else "No tasks yet.")
+        print(ERROR+f"No tasks found." if status_filter else "No tasks yet.")
     else:
-        print("Your tasks:" if status_filter is None else f"Your {status_filter} tasks:")
+        print(WARN+f"Your tasks:" if status_filter is None else f"Your {status_filter} tasks:")
         for task in filtered_tasks:
-            print(f"ID: {task['id']}, Desc: {task['description']}, Status: {task['status']}")
+            print(WARN+f"ID: {task['id']}, Desc: {task['description']}, Status: {task['status']}")
 
 def main():
     load_tasks()
-    print("Welcome to the Task Manager CLI!")
+    print(WARN+f"Welcome to the Task Manager CLI!")
     while True:
-        command = input('''Enter a command 
+        command = input(INFO+f'''Enter a command 
             - add 
              - list(add their status to filter ex : list done/ list todo)
               - remove
@@ -157,24 +166,24 @@ def main():
                 task_id = int(input("Enter the ID of the task to mark in-progress: "))
                 mark_in_progress(task_id)
             except ValueError:
-                print("Invalid ID.")
+                print(ERROR+f"Invalid ID.")
         elif command.startswith("mark-done"):
             try:
                 task_id = int(input("Enter the ID of the task to mark done: "))
                 mark_done(task_id)
             except ValueError:
-                print("Invalid ID.")
+                print(ERROR+f"Invalid ID.")
         elif command.startswith("mark-todo"):
             try:
                 task_id = int(input("Enter the ID of the task to mark todo: "))
                 mark_todo(task_id)
             except ValueError:
-                print("Invalid ID.")
+                print(ERROR+f"Invalid ID.")
         elif command == "exit":
-            print("Goodbye!")
+            print(INFO+f"Goodbye!")
             break
         else:
-            print("Unknown command. Try again.")
+            print(ERROR+f"Unknown command. Try again.")
 
 if __name__ == "__main__":
     main()
