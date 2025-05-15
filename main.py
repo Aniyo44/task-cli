@@ -1,12 +1,39 @@
 import datetime
+import os 
+import json 
+TASKS_FILE = "tasks.json"
+
 tasks = []
 next_id=1 
+
+def load_tasks():
+    global tasks, next_id
+    if os.path.exists(TASKS_FILE):
+        with open(TASKS_FILE, "r") as f:
+            try:
+                tasks_data = json.load(f)
+                tasks = tasks_data.get("tasks", [])
+                next_id = tasks_data.get("next_id", 1)
+            except json.JSONDecodeError:
+                print("Error reading tasks.json. Starting with an empty task list.")
+                tasks = []
+                next_id = 1
+    else:
+        tasks = []
+        next_id = 1 
+def save_tasks():
+    with open(TASKS_FILE, "w") as f:
+        json.dump({
+            "tasks": tasks,
+            "next_id": next_id
+        }, f, indent=4)
 
 def mark_todo(task_id):
     for task in tasks:
         if task["id"]== task_id:
             task["status"]="todo"
             task["updatedAt"] = get_current_time()
+            save_tasks() 
             print(f"Task ID {task_id} todo.")
             return
     print("NO task found with that ID.")    
@@ -18,6 +45,7 @@ def mark_in_progress(task_id):
         if task["id"] == task_id:
             task["status"] = "in-progress"
             task["updatedAt"] = get_current_time()
+            save_tasks() 
             print(f"Task ID {task_id} marked as in-progress.")
             return
     print("No task found with that ID.")
@@ -27,6 +55,7 @@ def mark_done(task_id):
         if task["id"] == task_id:
             task["status"] = "done"
             task["updatedAt"] = get_current_time()
+            save_tasks() 
             print(f"Task ID {task_id} marked as done.")
             return
     print("No task found with that ID.")
@@ -44,6 +73,7 @@ def update_task():
                 if new_status in ["todo", "in-progress", "done"]:
                     task["status"] = new_status
                 task["updatedAt"] = get_current_time()
+                save_tasks() 
                 print(f"Updated task ID {task_id}")
                 return
         print("No task found with that ID.")
@@ -56,6 +86,7 @@ def remove_task():
         for task in tasks:
             if task["id"] == task_id:
                 tasks.remove(task)
+                save_tasks() 
                 print(f"Removed task ID {task_id}")
                 return
         print("No task found with that ID.")
@@ -76,8 +107,10 @@ def add_task():
             "updatedAt": get_current_time()
         }
         tasks.append(task)
+
         print(f"Task added with ID {next_id}")
         next_id += 1
+        save_tasks() 
     else:
         print("No task entered. Try again.")
 
@@ -93,6 +126,7 @@ def show_tasks(status_filter=None):
             print(f"ID: {task['id']}, Desc: {task['description']}, Status: {task['status']}")
 
 def main():
+    load_tasks()
     print("Welcome to the Task Manager CLI!")
     while True:
         command = input('''Enter a command 
