@@ -25,11 +25,17 @@ Install it with:
 
 ```bash
 pip install colorama
+```
 🛠️ How to Use
 Run the script from your terminal:
+```bash
+
     python main.py
+```
 
 🧪 Example
+```bash
+
 
 Welcome to the Task Manager CLI!
 Enter a command: add
@@ -47,3 +53,4 @@ Task ID 1 marked as done.
 Enter a command: list done
 Your tasks:
 ID: 1, Desc: Finish the project, Status: done
+```
